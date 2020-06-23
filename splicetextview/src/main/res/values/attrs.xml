@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <declare-styleable name="SpliceTextView">
+        <!--全部文本的设置-->
+        <attr name="textSize" format="dimension" />
+        <attr name="textColor" format="reference|color" />
+        <attr name="textGravity">
+            <flag name="center" value="1" />
+            <flag name="center_vertical" value="2" />
+            <flag name="center_horizontal" value="3" />
+            <flag name="right" value="4" />
+        </attr>
+
+        <!--开始的文本-->
+        <attr name="startText" format="string" />
+        <attr name="startTextSize" format="dimension" />
+        <attr name="startTextColor" format="reference|color" />
+        <attr name="startLineSpacingExtra" format="dimension" />
+        <attr name="startLineSpacingMultiplier" format="float" />
+        <attr name="startMargin" format="dimension" />
+        <attr name="startMarginLeft" format="dimension" />
+        <attr name="startMarginRight" format="dimension" />
+        <attr name="startMarginTop" format="dimension" />
+        <attr name="startMarginBottom" format="dimension" />
+        <attr name="startPadding" format="dimension" />
+        <attr name="startPaddingLeft" format="dimension" />
+        <attr name="startPaddingRight" format="dimension" />
+        <attr name="startPaddingTop" format="dimension" />
+        <attr name="startPaddingBottom" format="dimension" />
+        <attr name="startBackground" format="reference" />
+        <attr name="startOpenJustTextView" format="boolean" />
+        <attr name="startTextVisibility">
+            <flag name="visible" value="1" />
+            <flag name="invisible" value="2" />
+            <flag name="gone" value="3" />
+            <flag name="alphaShow" value="4" />
+            <flag name="alphaHint" value="5" />
+        </attr>
+        <attr name="startTextGravity">
+            <flag name="center" value="1" />
+            <flag name="center_vertical" value="2" />
+            <flag name="center_horizontal" value="3" />
+            <flag name="right" value="4" />
+        </attr>
+        <attr name="startTextStyle">
+            <flag name="bold" value="1" />
+            <flag name="normal" value="2" />
+            <flag name="italic" value="3" />
+        </attr>
+
+        <!--中间的文本-->
+        <attr name="centerText" format="string" />
+        <attr name="centerTextSize" format="dimension" />
+        <attr name="centerTextColor" format="reference|color" />
+        <attr name="centerLineSpacingExtra" format="dimension" />
+        <attr name="centerLineSpacingMultiplier" format="float" />
+        <attr name="centerMargin" format="dimension" />
+        <attr name="centerMarginLeft" format="dimension" />
+        <attr name="centerMarginRight" format="dimension" />
+        <attr name="centerMarginTop" format="dimension" />
+        <attr name="centerMarginBottom" format="dimension" />
+        <attr name="centerPadding" format="dimension" />
+        <attr name="centerPaddingLeft" format="dimension" />
+        <attr name="centerPaddingRight" format="dimension" />
+        <attr name="centerPaddingTop" format="dimension" />
+        <attr name="centerPaddingBottom" format="dimension" />
+        <attr name="centerBackground" format="reference" />
+        <attr name="centerOpenJustTextView" format="boolean" />
+        <attr name="centerTextVisibility">
+            <flag name="visible" value="1" />
+            <flag name="invisible" value="2" />
+            <flag name="gone" value="3" />
+            <flag name="alphaShow" value="4" />
+            <flag name="alphaHint" value="5" />
+        </attr>
+        <attr name="centerTextGravity">
+            <flag name="center" value="1" />
+            <flag name="center_vertical" value="2" />
+            <flag name="center_horizontal" value="3" />
+            <flag name="right" value="4" />
+        </attr>
+        <attr name="centerTextStyle">
+            <flag name="bold" value="1" />
+            <flag name="normal" value="2" />
+            <flag name="italic" value="3" />
+        </attr>
+
+        <!--结束的文本-->
+        <attr name="endText" format="string" />
+        <attr name="endTextSize" format="dimension" />
+        <attr name="endTextColor" format="reference|color" />
+        <attr name="endLineSpacingExtra" format="dimension" />
+        <attr name="endLineSpacingMultiplier" format="float" />
+        <attr name="endMargin" format="dimension" />
+        <attr name="endMarginLeft" format="dimension" />
+        <attr name="endMarginRight" format="dimension" />
+        <attr name="endMarginTop" format="dimension" />
+        <attr name="endMarginBottom" format="dimension" />
+        <attr name="endPadding" format="dimension" />
+        <attr name="endPaddingLeft" format="dimension" />
+        <attr name="endPaddingRight" format="dimension" />
+        <attr name="endPaddingTop" format="dimension" />
+        <attr name="endPaddingBottom" format="dimension" />
+        <attr name="endBackground" format="reference" />
+        <attr name="endOpenJustTextView" format="boolean" />
+        <attr name="endTextVisibility">
+            <flag name="visible" value="1" />
+            <flag name="invisible" value="2" />
+            <flag name="gone" value="3" />
+            <flag name="alphaShow" value="4" />
+            <flag name="alphaHint" value="5" />
+        </attr>
+        <attr name="endTextGravity">
+            <flag name="center" value="1" />
+            <flag name="center_vertical" value="2" />
+            <flag name="center_horizontal" value="3" />
+            <flag name="right" value="4" />
+        </attr>
+        <attr name="endTextStyle">
+            <flag name="bold" value="1" />
+            <flag name="normal" value="2" />
+            <flag name="italic" value="3" />
+        </attr>
+    </declare-styleable>
+
+
+</resources>

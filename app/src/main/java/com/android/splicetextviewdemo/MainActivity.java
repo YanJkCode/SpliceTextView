@@ -19,7 +19,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mViewById = findViewById(R.id.text);
+
         setStvAlohaProgress(mViewById, progressUtil.getAlphaAnim(progressUtil.SHOW, 2000));
+
         findViewById(R.id.btn1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

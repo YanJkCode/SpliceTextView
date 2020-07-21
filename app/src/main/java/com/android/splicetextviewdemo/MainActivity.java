@@ -5,20 +5,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
+import com.android.chineseedittext.ChineseEditText;
+import com.android.splicetextview.SpliceEditTextView;
 import com.android.splicetextview.SpliceTextView;
 
 public class MainActivity extends AppCompatActivity {
 
     private SpliceTextView mViewById;
+    private SpliceEditTextView editTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mViewById = findViewById(R.id.text);
+        editTv = findViewById(R.id.edit_tv);
 
         setStvAlohaProgress(mViewById, progressUtil.getAlphaAnim(progressUtil.SHOW, 2000));
 
@@ -48,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         //        Toast.makeText(MainActivity.this, "点击", Toast.LENGTH_SHORT).show();
         //    }
         //});
+
+        editTv.setCenterEditTextView(new ChineseEditText(this));
     }
 
     private void setStvAlohaProgress(final SpliceTextView stv, ValueAnimator alphaAnimator) {
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float target = (float) animation.getAnimatedValue();
-                stv.setEndTextAlpha(target);
+                stv.setEndViewAlpha(target);
             }
         });
         alphaAnimator.start();

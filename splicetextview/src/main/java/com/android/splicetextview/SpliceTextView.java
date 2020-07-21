@@ -4,10 +4,14 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -44,7 +48,10 @@ public class SpliceTextView extends LinearLayout {
     private int startPaddingTop;
     private int startPaddingBottom;
     private int startBackground;
-    private boolean startOpenJustTextView;
+    private int startViewState;
+    private int startTextMaxLength;
+    private int startTextMaxLines;
+    private String startTextTypefaceNmae;
 
     private CharSequence centerText;
     private float centerTextSize;
@@ -65,7 +72,10 @@ public class SpliceTextView extends LinearLayout {
     private int centerPaddingTop;
     private int centerPaddingBottom;
     private int centerBackground;
-    private boolean centerOpenJustTextView;
+    private int centerViewState;
+    private int centerTextMaxLength;
+    private int centerTextMaxLines;
+    private String centerTextTypefaceNmae;
 
     private CharSequence endText;
     private float endTextSize;
@@ -86,15 +96,22 @@ public class SpliceTextView extends LinearLayout {
     private int endPaddingTop;
     private int endPaddingBottom;
     private int endBackground;
-    private boolean endOpenJustTextView;
+    private int endViewState;
+    private int endTextMaxLength;
+    private int endTextMaxLines;
+    private String endTextTypefaceNmae;
 
     private TextView startTextView;
     private TextView centerTextView;
     private TextView endTextView;
 
-    private boolean isStartTextAdd;
-    private boolean isCenterTextAdd;
-    private boolean isEndTextAdd;
+    private ImageView startImageView;
+    private ImageView centerImageView;
+    private ImageView endImageView;
+
+    private boolean isStartViewAdd;
+    private boolean isCenterViewAdd;
+    private boolean isEndViewAdd;
 
 
     public static final int VISIBLE = 1;
@@ -111,6 +128,10 @@ public class SpliceTextView extends LinearLayout {
     public static final int BOLD = 1;
     public static final int NORMAL = 2;
     public static final int ITALIC = 3;
+
+    public static final int TEXT_VIEW = 0;
+    public static final int JUST_TEXT_VIEW = 1;
+    public static final int IMAGE_VIEW = 2;
 
     public SpliceTextView(Context context) {
         this(context, null);
@@ -133,7 +154,6 @@ public class SpliceTextView extends LinearLayout {
             textColor = ta.getColor(R.styleable.SpliceTextView_textColor, 0);
             textGravity = ta.getInt(R.styleable.SpliceTextView_textGravity, 0);
 
-
             startText = ta.getString(R.styleable.SpliceTextView_startText);
             startTextSize = ScreenUtil.px2dip(context, ta.getDimension(R.styleable.SpliceTextView_startTextSize, 0));
             startLineSpacingExtra = ta.getDimension(R.styleable.SpliceTextView_startLineSpacingExtra, 0);
@@ -142,7 +162,7 @@ public class SpliceTextView extends LinearLayout {
             startTextGravity = ta.getInt(R.styleable.SpliceTextView_startTextGravity, 0);
             startTextVisibility = ta.getInt(R.styleable.SpliceTextView_startTextVisibility, 0);
             startTextStyle = ta.getInt(R.styleable.SpliceTextView_startTextStyle, 0);
-            startOpenJustTextView = ta.getBoolean(R.styleable.SpliceTextView_startOpenJustTextView, true);
+            startViewState = ta.getInt(R.styleable.SpliceTextView_startViewState, 0);
 
             startMargin = (int) ta.getDimension(R.styleable.SpliceTextView_startMargin, 0);
             startMarginLeft = (int) ta.getDimension(R.styleable.SpliceTextView_startMarginLeft, 0);
@@ -156,15 +176,27 @@ public class SpliceTextView extends LinearLayout {
             startPaddingTop = (int) ta.getDimension(R.styleable.SpliceTextView_startPaddingTop, 0);
             startPaddingBottom = (int) ta.getDimension(R.styleable.SpliceTextView_startPaddingBottom, 0);
 
+            startTextMaxLength = ta.getInt(R.styleable.SpliceTextView_startTextMaxLength, 0);
+            startTextMaxLines = ta.getInt(R.styleable.SpliceTextView_startTextMaxLines, 0);
+
+            startTextTypefaceNmae = ta.getString(R.styleable.SpliceTextView_startTextTypefaceNmae);
+
             startBackground = ta.getResourceId(R.styleable.SpliceTextView_startBackground, 0);
-            if (startOpenJustTextView) {
-                startTextView = new JustTextView(context);
-            } else {
-                startTextView = new TextView(context);
+            switch (startViewState) {
+                case TEXT_VIEW:
+                    startTextView = new TextView(context);
+                    setStartText(startText);
+                    break;
+                case JUST_TEXT_VIEW:
+                    startTextView = new JustTextView(context);
+                    setStartText(startText);
+                    break;
+                case IMAGE_VIEW:
+                    startImageView = new ImageView(context);
+                    startImageView.setAdjustViewBounds(true);
+                    setStartImageview();
+                    break;
             }
-            initText(startTextView, startLineSpacingExtra, startLineSpacingMultiplier,
-                    startTextVisibility, startTextGravity, startTextSize, startTextColor, startBackground, startTextStyle);
-            setStartText(startText);
 
 
             centerText = ta.getString(R.styleable.SpliceTextView_centerText);
@@ -175,7 +207,7 @@ public class SpliceTextView extends LinearLayout {
             centerTextGravity = ta.getInt(R.styleable.SpliceTextView_centerTextGravity, 0);
             centerTextVisibility = ta.getInt(R.styleable.SpliceTextView_centerTextVisibility, 0);
             centerTextStyle = ta.getInt(R.styleable.SpliceTextView_centerTextStyle, 0);
-            centerOpenJustTextView = ta.getBoolean(R.styleable.SpliceTextView_centerOpenJustTextView, true);
+            centerViewState = ta.getInt(R.styleable.SpliceTextView_centerViewState, 0);
 
 
             centerMargin = (int) ta.getDimension(R.styleable.SpliceTextView_centerMargin, 0);
@@ -190,16 +222,28 @@ public class SpliceTextView extends LinearLayout {
             centerPaddingTop = (int) ta.getDimension(R.styleable.SpliceTextView_centerPaddingTop, 0);
             centerPaddingBottom = (int) ta.getDimension(R.styleable.SpliceTextView_centerPaddingBottom, 0);
 
+            centerTextMaxLength = ta.getInt(R.styleable.SpliceTextView_centerTextMaxLength, 0);
+            centerTextMaxLines = ta.getInt(R.styleable.SpliceTextView_centerTextMaxLines, 0);
+
+            centerTextTypefaceNmae = ta.getString(R.styleable.SpliceTextView_centerTextTypefaceNmae);
+
             centerBackground = ta.getResourceId(R.styleable.SpliceTextView_centerBackground, 0);
 
-            if (centerOpenJustTextView) {
-                centerTextView = new JustTextView(context);
-            } else {
-                centerTextView = new TextView(context);
+            switch (centerViewState) {
+                case TEXT_VIEW:
+                    centerTextView = new TextView(context);
+                    setCenterText(centerText);
+                    break;
+                case JUST_TEXT_VIEW:
+                    centerTextView = new JustTextView(context);
+                    setCenterText(centerText);
+                    break;
+                case IMAGE_VIEW:
+                    centerImageView = new ImageView(context);
+                    centerImageView.setAdjustViewBounds(true);
+                    setCenterImageview();
+                    break;
             }
-            initText(centerTextView, centerLineSpacingExtra, centerLineSpacingMultiplier,
-                    centerTextVisibility, centerTextGravity, centerTextSize, centerTextColor, centerBackground, centerTextStyle);
-            setCenterText(centerText);
 
             endText = ta.getString(R.styleable.SpliceTextView_endText);
             endTextSize = ScreenUtil.px2dip(context, ta.getDimension(R.styleable.SpliceTextView_endTextSize, 0));
@@ -209,7 +253,7 @@ public class SpliceTextView extends LinearLayout {
             endTextGravity = ta.getInt(R.styleable.SpliceTextView_endTextGravity, 0);
             endTextVisibility = ta.getInt(R.styleable.SpliceTextView_endTextVisibility, 0);
             endTextStyle = ta.getInt(R.styleable.SpliceTextView_endTextStyle, 0);
-            endOpenJustTextView = ta.getBoolean(R.styleable.SpliceTextView_endOpenJustTextView, true);
+            endViewState = ta.getInt(R.styleable.SpliceTextView_endViewState, 0);
 
             endMargin = (int) ta.getDimension(R.styleable.SpliceTextView_endMargin, 0);
             endMarginLeft = (int) ta.getDimension(R.styleable.SpliceTextView_endMarginLeft, 0);
@@ -223,20 +267,31 @@ public class SpliceTextView extends LinearLayout {
             endPaddingTop = (int) ta.getDimension(R.styleable.SpliceTextView_endPaddingTop, 0);
             endPaddingBottom = (int) ta.getDimension(R.styleable.SpliceTextView_endPaddingBottom, 0);
 
+            endTextMaxLength = ta.getInt(R.styleable.SpliceTextView_endTextMaxLength, 0);
+            endTextMaxLines = ta.getInt(R.styleable.SpliceTextView_endTextMaxLines, 0);
+
+            endTextTypefaceNmae = ta.getString(R.styleable.SpliceTextView_endTextTypefaceNmae);
+
             endBackground = ta.getResourceId(R.styleable.SpliceTextView_endBackground, 0);
-            if (endOpenJustTextView) {
-                endTextView = new JustTextView(context);
-            } else {
-                endTextView = new TextView(context);
+            switch (endViewState) {
+                case TEXT_VIEW:
+                    endTextView = new TextView(context);
+                    setEndText(endText);
+                    break;
+                case JUST_TEXT_VIEW:
+                    endTextView = new JustTextView(context);
+                    setEndText(endText);
+                    break;
+                case IMAGE_VIEW:
+                    endImageView = new ImageView(context);
+                    endImageView.setAdjustViewBounds(true);
+                    setEndImageview();
+                    break;
             }
-            initText(endTextView, endLineSpacingExtra, endLineSpacingMultiplier,
-                    endTextVisibility, endTextGravity, endTextSize, endTextColor, endBackground, endTextStyle);
-            setEndText(endText);
         }
-        invalidate();
     }
 
-    private void initTextMargin(TextView tv, int margin, int marginLeft, int marginRight, int marginTop, int marginBottom) {
+    private void initTextMargin(View tv, int margin, int marginLeft, int marginRight, int marginTop, int marginBottom) {
         if (margin != 0 || marginLeft != 0 || marginRight != 0 || marginTop != 0 || marginBottom != 0) {
             LayoutParams layoutParams = (LayoutParams) tv.getLayoutParams();
             layoutParams.setMargins(Math.max(margin, marginLeft), Math.max(margin, marginTop), Math.max(margin, marginRight),
@@ -245,7 +300,7 @@ public class SpliceTextView extends LinearLayout {
         }
     }
 
-    private void initTextPadding(TextView tv, int padding, int paddingLeft, int paddingRight, int paddingTop, int paddingBottom) {
+    private void initTextPadding(View tv, int padding, int paddingLeft, int paddingRight, int paddingTop, int paddingBottom) {
         if (padding != 0 || paddingLeft != 0 || paddingRight != 0 || paddingTop != 0 || paddingBottom != 0) {
             tv.setPadding(Math.max(padding, paddingLeft), Math.max(padding, paddingTop), Math.max(padding, paddingRight),
                     Math.max(padding, paddingBottom));
@@ -253,9 +308,11 @@ public class SpliceTextView extends LinearLayout {
     }
 
     private void initText(TextView textView, float lineSpacingExtra, float lineSpacingMultiplier, int textVisibility,
-                          int textGravity, float textSize, int textColor, int backgroundRes, int textStyle) {
-
-        //endTextView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 1.0f));
+                          int textGravity, float textSize, int textColor, int backgroundRes, int textStyle,
+                          int textMaxLength, int textMaxLines, String typefaceNmae) {
+        if (textView == null) {
+            return;
+        }
         if (lineSpacingExtra != 0 || lineSpacingMultiplier != 1) {
             textView.setLineSpacing(lineSpacingExtra, lineSpacingMultiplier);
         }
@@ -291,6 +348,43 @@ public class SpliceTextView extends LinearLayout {
         if (backgroundRes != 0) {
             textView.setBackgroundResource(backgroundRes);
         }
+        if (textMaxLength != 0) {
+            textView.setFilters(new InputFilter[]{new InputFilter.LengthFilter(textMaxLength)});
+        }
+        if (textMaxLines != 0) {
+            textView.setMaxLines(textMaxLines);
+        }
+
+        setTypface(textView, typefaceNmae);
+    }
+
+    private void setTypface(TextView textView, String typefaceNmae) {
+        if (textView == null || TextUtils.isEmpty(typefaceNmae)) {
+            return;
+        }
+        Typeface fromAsset = Typeface.createFromAsset(getContext().getAssets(), typefaceNmae);
+        if (fromAsset != null) {
+            textView.setTypeface(fromAsset);
+        }
+    }
+
+    private void initImageView(ImageView imageView, int textVisibility, int textGravity, int backgroundRes) {
+        if (imageView == null) {
+            return;
+        }
+        if (textVisibility != 0) {
+            setTextVisibility(imageView, textVisibility);
+        }
+        if (this.textGravity != 0) {
+            setImageViewGravity(imageView, this.textGravity);
+        } else {
+            if (textGravity != 0) {
+                setImageViewGravity(imageView, textGravity);
+            }
+        }
+        if (backgroundRes != 0) {
+            imageView.setImageResource(backgroundRes);
+        }
     }
 
     private void setTextGravity(TextView tv, @SpliceGravity int type) {
@@ -311,7 +405,31 @@ public class SpliceTextView extends LinearLayout {
             }
     }
 
-    private void setTextVisibility(TextView tv, @SpliceVisibility int type) {
+    private void setImageViewGravity(ImageView tv, @SpliceGravity int type) {
+        if (tv != null) {
+            ViewGroup.LayoutParams params = tv.getLayoutParams();
+            if (params != null && params instanceof LinearLayout.LayoutParams) {
+                LayoutParams layoutParams = (LayoutParams) params;
+                switch (type) {
+                    case CENTER:
+                        layoutParams.gravity = Gravity.CENTER;
+                        break;
+                    case CENTER_VERTICAL:
+                        layoutParams.gravity = Gravity.CENTER_VERTICAL;
+                        break;
+                    case CENTER_HORIZONTAL:
+                        layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+                        break;
+                    case RIGHT:
+                        layoutParams.gravity = Gravity.RIGHT;
+                        break;
+                }
+                tv.setLayoutParams(layoutParams);
+            }
+        }
+    }
+
+    private void setTextVisibility(View tv, @SpliceVisibility int type) {
         if (tv != null)
             switch (type) {
                 case VISIBLE:
@@ -379,11 +497,48 @@ public class SpliceTextView extends LinearLayout {
         if (!TextUtils.isEmpty(startText) && startTextView != null) {
             this.startText = startText;
             startTextView.setText(startText);
-            if (!isStartTextAdd) {
-                isStartTextAdd = true;
+            if (!isStartViewAdd) {
+                isStartViewAdd = true;
                 addView(startTextView, 0);
+                initText(startTextView, startLineSpacingExtra, startLineSpacingMultiplier,
+                        startTextVisibility, startTextGravity, startTextSize, startTextColor, startBackground, startTextStyle, startTextMaxLength,
+                        startTextMaxLines, startTextTypefaceNmae);
                 initTextMargin(startTextView, startMargin, startMarginLeft, startMarginRight, startMarginTop, startMarginBottom);
                 initTextPadding(startTextView, startPadding, startPaddingLeft, startPaddingRight, startPaddingTop, startPaddingBottom);
+            }
+        }
+    }
+
+    @Override
+    public void addView(View child) {
+        if (child != null && child.getParent() != null) {
+            ViewParent parent = child.getParent();
+            if (parent instanceof ViewGroup) {
+                ((ViewGroup) parent).removeView(child);
+            }
+        }
+        super.addView(child, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+    }
+
+    @Override
+    public void addView(View child, int index) {
+        if (child != null && child.getParent() != null) {
+            ViewParent parent = child.getParent();
+            if (parent instanceof ViewGroup) {
+                ((ViewGroup) parent).removeView(child);
+            }
+        }
+        super.addView(child, index, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+    }
+
+    public void setStartImageview() {
+        if (startImageView != null) {
+            if (!isStartViewAdd) {
+                isStartViewAdd = true;
+                addView(startImageView, 0);
+                initImageView(startImageView, startTextVisibility, startTextGravity, startBackground);
+                initTextMargin(startImageView, startMargin, startMarginLeft, startMarginRight, startMarginTop, startMarginBottom);
+                initTextPadding(startImageView, startPadding, startPaddingLeft, startPaddingRight, startPaddingTop, startPaddingBottom);
             }
         }
     }
@@ -407,18 +562,40 @@ public class SpliceTextView extends LinearLayout {
         if (!TextUtils.isEmpty(centerText) && centerTextView != null) {
             this.centerText = centerText;
             centerTextView.setText(centerText);
-            if (!isCenterTextAdd) {
-                isCenterTextAdd = true;
-                if (isStartTextAdd) {
+            if (!isCenterViewAdd) {
+                isCenterViewAdd = true;
+                if (isStartViewAdd) {
                     addView(centerTextView, 1);
-                } else if (isEndTextAdd) {
+                } else if (isEndViewAdd) {
                     addView(centerTextView, 0);
                 } else {
                     addView(centerTextView);
                 }
+                initText(centerTextView, centerLineSpacingExtra, centerLineSpacingMultiplier,
+                        centerTextVisibility, centerTextGravity, centerTextSize, centerTextColor, centerBackground, centerTextStyle,
+                        centerTextMaxLength, centerTextMaxLines, centerTextTypefaceNmae);
                 initTextMargin(centerTextView, centerMargin, centerMarginLeft, centerMarginRight, centerMarginTop, centerMarginBottom);
                 initTextPadding(centerTextView, centerPadding, centerPaddingLeft, centerPaddingRight, centerPaddingTop,
                         centerPaddingBottom);
+
+            }
+        }
+    }
+
+    public void setCenterImageview() {
+        if (centerImageView != null) {
+            if (!isCenterViewAdd) {
+                isCenterViewAdd = true;
+                if (isStartViewAdd) {
+                    addView(centerImageView, 1);
+                } else if (isEndViewAdd) {
+                    addView(centerImageView, 0);
+                } else {
+                    addView(centerImageView);
+                }
+                initImageView(centerImageView, centerTextVisibility, centerTextGravity, centerBackground);
+                initTextMargin(centerImageView, centerMargin, centerMarginLeft, centerMarginRight, centerMarginTop, centerMarginBottom);
+                initTextPadding(centerImageView, centerPadding, centerPaddingLeft, centerPaddingRight, centerPaddingTop, centerPaddingBottom);
             }
         }
     }
@@ -441,17 +618,38 @@ public class SpliceTextView extends LinearLayout {
         if (!TextUtils.isEmpty(endText) && endTextView != null) {
             this.endText = endText;
             endTextView.setText(endText);
-            if (!isEndTextAdd) {
-                isEndTextAdd = true;
-                if (isStartTextAdd && isCenterTextAdd) {
+            if (!isEndViewAdd) {
+                isEndViewAdd = true;
+                if (isStartViewAdd && isCenterViewAdd) {
                     addView(endTextView);
-                } else if (!isStartTextAdd && isCenterTextAdd) {
+                } else if (!isStartViewAdd && isCenterViewAdd) {
                     addView(endTextView, 1);
                 } else {
                     addView(endTextView);
                 }
+                initText(endTextView, endLineSpacingExtra, endLineSpacingMultiplier,
+                        endTextVisibility, endTextGravity, endTextSize, endTextColor, endBackground, endTextStyle,
+                        endTextMaxLength, endTextMaxLines, endTextTypefaceNmae);
                 initTextMargin(endTextView, endMargin, endMarginLeft, endMarginRight, endMarginTop, endMarginBottom);
                 initTextPadding(endTextView, endPadding, endPaddingLeft, endPaddingRight, endPaddingTop, endPaddingBottom);
+            }
+        }
+    }
+
+    public void setEndImageview() {
+        if (endImageView != null) {
+            if (!isEndViewAdd) {
+                isEndViewAdd = true;
+                if (isStartViewAdd && isCenterViewAdd) {
+                    addView(endImageView);
+                } else if (!isStartViewAdd && isCenterViewAdd) {
+                    addView(endImageView, 1);
+                } else {
+                    addView(endImageView);
+                }
+                initImageView(endImageView, endTextVisibility, endTextGravity, endBackground);
+                initTextMargin(endImageView, endMargin, endMarginLeft, endMarginRight, endMarginTop, endMarginBottom);
+                initTextPadding(endImageView, endPadding, endPaddingLeft, endPaddingRight, endPaddingTop, endPaddingBottom);
             }
         }
     }
@@ -470,20 +668,38 @@ public class SpliceTextView extends LinearLayout {
         }
     }
 
-    public void setStartTextVisibility(@SpliceVisibility int startTextVisibility) {
+    public void setStartViewVisibility(@SpliceVisibility int startTextVisibility) {
         this.startTextVisibility = startTextVisibility;
-        setTextVisibility(startTextView, startTextVisibility);
+        if (startTextView != null) {
+            setTextVisibility(startTextView, startTextVisibility);
+        } else {
+            if (startImageView != null) {
+                setTextVisibility(startImageView, startTextVisibility);
+            }
+        }
     }
 
-    public void setCenterTextVisibility(@SpliceVisibility int centerTextVisibility) {
+    public void setCenterViewVisibility(@SpliceVisibility int centerTextVisibility) {
         this.centerTextVisibility = centerTextVisibility;
-        setTextVisibility(centerTextView, centerTextVisibility);
+        if (centerTextView != null) {
+            setTextVisibility(centerTextView, centerTextVisibility);
+        } else {
+            if (centerImageView != null) {
+                setTextVisibility(centerImageView, centerTextVisibility);
+            }
+        }
     }
 
 
-    public void setEndTextVisibility(@SpliceVisibility int endTextVisibility) {
+    public void setEndViewVisibility(@SpliceVisibility int endTextVisibility) {
         this.endTextVisibility = endTextVisibility;
-        setTextVisibility(endTextView, endTextVisibility);
+        if (endTextView != null) {
+            setTextVisibility(endTextView, endTextVisibility);
+        } else {
+            if (endImageView != null) {
+                setTextVisibility(endImageView, endTextVisibility);
+            }
+        }
     }
 
     public void setStartTextGravity(@SpliceGravity int startTextGravity) {
@@ -508,19 +724,40 @@ public class SpliceTextView extends LinearLayout {
         setTextGravity(endTextView, textGravity);
     }
 
-    public void setStartTextAlpha(float alpha) {
-        if (startTextView != null && alpha >= 0)
-            startTextView.setAlpha(alpha);
+    public void setStartViewAlpha(float alpha) {
+        if (alpha >= 0) {
+            if (startTextView != null) {
+                startTextView.setAlpha(alpha);
+            } else {
+                if (startImageView != null) {
+                    startImageView.setAlpha(alpha);
+                }
+            }
+        }
     }
 
-    public void setCenterTextAlpha(float alpha) {
-        if (centerTextView != null && alpha >= 0)
-            centerTextView.setAlpha(alpha);
+    public void setCenterViewAlpha(float alpha) {
+        if (alpha >= 0) {
+            if (centerTextView != null) {
+                centerTextView.setAlpha(alpha);
+            } else {
+                if (centerImageView != null) {
+                    centerImageView.setAlpha(alpha);
+                }
+            }
+        }
     }
 
-    public void setEndTextAlpha(float alpha) {
-        if (endTextView != null && alpha >= 0)
-            endTextView.setAlpha(alpha);
+    public void setEndViewAlpha(float alpha) {
+        if (alpha >= 0) {
+            if (endTextView != null) {
+                endTextView.setAlpha(alpha);
+            } else {
+                if (endImageView != null) {
+                    endImageView.setAlpha(alpha);
+                }
+            }
+        }
     }
 
     public void setStartLineSpacingExtra(int startLineSpacingExtra) {
@@ -588,6 +825,10 @@ public class SpliceTextView extends LinearLayout {
         this.startBackground = startBackground;
         if (startTextView != null) {
             startTextView.setBackgroundResource(startBackground);
+        } else {
+            if (startImageView != null) {
+                startImageView.setImageResource(startBackground);
+            }
         }
     }
 
@@ -595,6 +836,10 @@ public class SpliceTextView extends LinearLayout {
         this.centerBackground = centerBackground;
         if (centerTextView != null) {
             centerTextView.setBackgroundResource(centerBackground);
+        } else {
+            if (centerImageView != null) {
+                centerImageView.setImageResource(centerBackground);
+            }
         }
     }
 
@@ -602,6 +847,10 @@ public class SpliceTextView extends LinearLayout {
         this.endBackground = endBackground;
         if (endTextView != null) {
             endTextView.setBackgroundResource(endBackground);
+        } else {
+            if (endImageView != null) {
+                endImageView.setImageResource(endBackground);
+            }
         }
     }
 
@@ -615,5 +864,20 @@ public class SpliceTextView extends LinearLayout {
 
     public TextView getEndTextView() {
         return endTextView;
+    }
+
+    public void setStartTextTypefaceNmae(String typefaceNmae) {
+        this.startTextTypefaceNmae = typefaceNmae;
+        setTypface(startTextView, startTextTypefaceNmae);
+    }
+
+    public void setCenterTextTypefaceNmae(String typefaceNmae) {
+        this.centerTextTypefaceNmae = typefaceNmae;
+        setTypface(centerTextView, centerTextTypefaceNmae);
+    }
+
+    public void setEndTextTypefaceNmae(String typefaceNmae) {
+        this.endTextTypefaceNmae = typefaceNmae;
+        setTypface(endTextView, endTextTypefaceNmae);
     }
 }

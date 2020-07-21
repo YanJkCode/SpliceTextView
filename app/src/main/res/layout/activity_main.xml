@@ -13,9 +13,12 @@
         android:orientation="vertical"
         app:centerBackground="@drawable/shape_c"
         app:centerLineSpacingExtra="4dp"
+        app:centerText="中间内容中间中间内容中间中间内容中间中间内容中间中间内容中间中间内容中间中间内容中间中间内容中间中间内容中间中间内容中间中间内容中间中间内容中间"
         app:centerTextColor="@android:color/holo_green_dark"
         app:centerTextGravity="center_horizontal"
         app:centerTextSize="20dp"
+        app:centerTextTypefaceNmae="kaiti.ttf"
+        app:endText="后面内容"
         app:endTextColor="@android:color/holo_blue_light"
         app:endTextGravity="right"
         app:endTextSize="20dp"
@@ -25,12 +28,10 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.584"
-        app:startBackground="@android:color/holo_blue_light"
+        app:startBackground="@drawable/ic_name_info_bazi_cube"
         app:startTextColor="@android:color/holo_red_light"
         app:startTextSize="10dp"
-        tools:centerText="中间内容中间"
-        tools:endText="后面内容"
-        tools:startText="前面内容" />
+        app:startViewState="ImageView" />
 
     <com.android.splicetextview.SpliceTextView
         android:id="@+id/text1"
@@ -56,6 +57,26 @@
         app:startText="前面内容"
         app:startTextColor="@android:color/holo_red_light"
         app:startTextSize="10dp" />
+
+    <com.android.splicetextview.SpliceEditTextView
+        android:id="@+id/edit_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_c"
+        app:centerHintText="123"
+        app:centerHintTextColor="#B9B9BB"
+        app:centerMarginLeft="22dp"
+        app:centerMarginRight="10dp"
+        app:centerTextMaxLines="1"
+        app:centerTextSize="12sp"
+        app:centerTextTypefaceNmae="kaiti.ttf"
+        app:layout_constraintBottom_toTopOf="@+id/text"
+        app:layout_constraintTop_toBottomOf="@+id/btn2"
+        app:startMarginLeft="28dp"
+        app:startText="手机的号"
+        app:startTextTypefaceNmae="kaiti.ttf">
+
+    </com.android.splicetextview.SpliceEditTextView>
 
     <Button
         android:id="@+id/btn1"
